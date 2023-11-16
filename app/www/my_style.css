@@ -1,0 +1,13 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.fisher_background {
+  /*background: url(fisher_background.jpg);
+  background-size: cover;
+  opacity: 0.5;*/
+}
+
+p {
+  text-size: smaller
+}

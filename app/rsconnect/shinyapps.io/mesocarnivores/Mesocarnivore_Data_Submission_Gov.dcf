@@ -5,7 +5,7 @@ account: mesocarnivores
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10552171
-bundleId: 7936993
+bundleId: 7937042
 url: https://mesocarnivores.shinyapps.io/Mesocarnivore_Data_Submission_Gov/
 version: 1
 asMultiple: FALSE

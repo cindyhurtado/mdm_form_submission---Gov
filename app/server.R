@@ -21,8 +21,8 @@ server <- function(input, output, session) {
         Project_ID = c('a'),
         Focal_Species = c('a'),
         Survey_ID = c('a'),
-        Privacy_Options = c('a'),
-        Other_Detail = c('a'),
+  #      Privacy_Options = c('a'),
+  #      Other_Detail = c('a'),
         Study_Area = c('a'),
         Data_File = c('a')
       ),
@@ -46,36 +46,6 @@ server <- function(input, output, session) {
   #       lapply(openxlsx::read.xlsx)
   #   )
   # })
-  
-  # Generate extra text for Privacy input
-  
-  output$privacy_info_text = renderText({
-    if(input$privacy_options_input == 'proj'){
-      return('\n\nRaw contributed data will only be used for the purpose 
-             of distribution maps and modelling. 
-             Data will be used for this objective only and will not be 
-             shared outside of the Conservation Science Section of the 
-             Ministry of Water Land and Resource Stewardship (WLRS). 
-             Data contributors will only be contacted in case of peer-review 
-             publications. All research data will be held and stored in 
-             perpetuity in a password protected folder on the network drive 
-             of the Ecosystems Branch of WLRS. The Carnivore Conservation Specialist 
-             (currently Joanna Burgar) will remain responsible for the data.')
-    }
-    if(input$privacy_options_input == 'secured'){
-      return('\n\nContributed data will be incorporated into provincial scale 
-             data systems but managed as secure proprietary data under the Species 
-             and Ecosystems Data and Information Security policy. Data secured 
-             under the Species and Ecosystems Data and Information Security policy 
-             may be shared by request with parties outside of government that have an 
-             appropriate rationale and sign a confidentiality agreement. 
-             Contributed data will not be made publicly accessible.')
-    }
-    if(input$privacy_options_input == 'public'){
-      return('\n\nContributed data will be incorporated into provincial scale data systems and managed as open data. 
-             Data will be publicly accessible. Example of publicly available database.')
-    }
-  })
   
   # Set up download handlers for template forms.
   
@@ -175,8 +145,8 @@ server <- function(input, output, session) {
               Project_ID = input$proj_id_input,
               Focal_Species = input$focal_species_input,
               Survey_ID = input$survey_id_input,
-              Privacy_Options = input$privacy_options_input,
-              Other_Detail = input$other_security_input,
+  #            Privacy_Options = input$privacy_options_input,
+  #            Other_Detail = input$other_security_input,
               Study_Area = input$study_area_input,
               Data_File = paste0(input$proj_id_input, '-',Sys.Date(),'.csv')
         )
@@ -220,7 +190,7 @@ server <- function(input, output, session) {
     shiny::updateTextInput(session = session, 'proj_id_input', value = '')
     shiny::updateTextInput(session = session, 'study_area_input', value = '')
     shiny::updateSelectInput(session = session, 'focal_species_input', selected = 'Multispecies')
-    shiny::updateSelectInput(session = session, 'privacy_options_input', selected = 'proj')
+#    shiny::updateSelectInput(session = session, 'privacy_options_input', selected = 'proj')
     
       } else {
         showModal(

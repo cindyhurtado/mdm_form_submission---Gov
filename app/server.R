@@ -11,31 +11,42 @@ server <- function(input, output, session) {
     setwd(paste0(getwd(),'/www'))
   }
   
-  # If no log-book currently, create the project 'log-book'
-  if(!file.exists('project_logbook.xlsx')){
-    openxlsx::write.xlsx(
-      data.frame(
-        Date = c('a'),
-        Name = c('a'),
-        Email = c('a'),
-        Project_ID = c('a'),
-        Focal_Species = c('a'),
-        Survey_ID = c('a'),
-  #      Privacy_Options = c('a'),
-  #      Other_Detail = c('a'),
-        Study_Area = c('a'),
-        Data_File = c('a')
-      ),
-      'project_logbook.xlsx'
-    )
-  }
+  # # If no log-book currently, create the project 'log-book'
+  # if(!file.exists('project_logbook.xlsx')){
+  #   openxlsx::write.xlsx(
+  #     data.frame(
+  #       Date = c('a'),
+  #       Name = c('a'),
+  #       Email = c('a'),
+  #       Project_ID = c('a'),
+  #       Focal_Species = c('a'),
+  #       Survey_ID = c('a'),
+  # #      Privacy_Options = c('a'),
+  # #      Other_Detail = c('a'),
+  #       Study_Area = c('a'),
+  #       Data_File = c('a')
+  #     ),
+  #     'project_logbook.xlsx'
+  #   )
+  # }
+  
+  # Setting authentication options
+  options(
+    # if a token is found, use it.
+    garge_oauth_email = TRUE,
+    garge_oauth_cache = 'credentials/.secrets'
+  )
+  
+  # browser()
+  # Read the log-book from the Google drive account.
+  googledrive::drive_download('MDM_Submitted_Data/project_logbook.xlsx', overwrite = T)
+#  print('read in logbook.')
   
   # Open the project 'log-book'
   log_book = openxlsx::read.xlsx(
     'project_logbook.xlsx'
-  ) |> 
+  ) |>
     dplyr::filter(Date != 'a')
-  
   # User data
   
   # user_data = reactive({
@@ -81,7 +92,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$submit_form, {
     
-    log_book = openxlsx::read.xlsx('project_logbook.xlsx')
+    # log_book = openxlsx::read.xlsx('project_logbook.xlsx')
     
     # Clear any shinyFeedback from prior rounds of submission attempts
     shinyFeedback::hideFeedback('name_input')
@@ -152,9 +163,24 @@ server <- function(input, output, session) {
         )
       )
     
-    # Update the log-book form in the www/ folder with this
-    # new entry.
-    openxlsx::write.xlsx(log_book, 'project_logbook.xlsx', overwrite = T)
+    openxlsx::write.xlsx(log_book,
+                         'project_logbook.xlsx')
+    
+    # Update the project XLSX file on google drive.
+    drive_update(
+      'MDM_Submitted_Data/project_logbook.xlsx',
+      media = 'project_logbook.xlsx'
+    )
+    
+    # # Update the log-book form in the www/ folder with this
+    # # new entry.
+    # drive_upload(
+    #   media = 'project_logbook.xlsx',
+    #   name = 'project_logbook.xlsx',
+    #   type = 'spreadsheet',
+    #   path = 'MDM_Submitted_Data', # target destination on drive
+    #   overwrite = TRUE
+    # ) 
     
     cat(paste0("\nJust updated excel logbook with row for ",input$proj_id_input))
     
@@ -163,8 +189,14 @@ server <- function(input, output, session) {
       # Read in the file that the user has uploaded.
       content = readr::read_csv(input$data_submission_input$datapath)
       
-      # And write that file to our data folder, inside the app's www/ folder.
       readr::write_csv(content, paste0('data/',input$proj_id_input, '-',Sys.Date(),'.csv'))
+      
+      googledrive::drive_upload(
+        media = paste0('data/',input$proj_id_input, '-',Sys.Date(),'.csv'),
+        path = 'MDM_Submitted_Data', 
+        name = paste0(input$proj_id_input, '-',Sys.Date(),'.csv'),
+        overwrite = T
+        )
     }
     
     if(stringr::str_detect(input$data_submission_input$datapath,'.xls(x)?')){
@@ -172,6 +204,13 @@ server <- function(input, output, session) {
       file.copy(
         from = input$data_submission_input$datapath,
         to = paste0('data/',input$proj_id_input,'-',Sys.Date(),stringr::str_extract(input$data_submission_input$name,'.xls(x)?$'))
+      )
+      
+      googledrive::drive_upload(
+        media = paste0('data/',input$proj_id_input,'-',Sys.Date(),stringr::str_extract(input$data_submission_input$name,'.xls(x)?$')),
+        path = 'MDM_Submitted_Data', 
+        name = paste0('data/',input$proj_id_input,'-',Sys.Date(),stringr::str_extract(input$data_submission_input$name,'.xls(x)?$')),
+        overwrite = T
       )
       
     }
@@ -204,25 +243,25 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$download_users_data, {
-    showModal(
-      modalDialog(
-      title = 'Log-in Credentials',
-      fluidRow(
-        column(width = 6,
-               textInput('username_input',
-                         'Username')
-        ),
-        column(width = 6,
-               textInput('password_input',
-                         'Password'))
-      ),
-      fluidRow(
-        downloadButton('submit_login_creds',
-                     'Submit Log-in Credentials')
-      ))
-      )
-  })
+  # observeEvent(input$download_users_data, {
+  #   showModal(
+  #     modalDialog(
+  #     title = 'Log-in Credentials',
+  #     fluidRow(
+  #       column(width = 6,
+  #              textInput('username_input',
+  #                        'Username')
+  #       ),
+  #       column(width = 6,
+  #              textInput('password_input',
+  #                        'Password'))
+  #     ),
+  #     fluidRow(
+  #       downloadButton('submit_login_creds',
+  #                    'Submit Log-in Credentials')
+  #     ))
+  #     )
+  # })
   
   # Create a 'downloadHandler' - this allows the user to download
   # things from the Shiny app to their computer's download folder, 

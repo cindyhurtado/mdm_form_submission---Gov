@@ -2,6 +2,7 @@
 library(shiny)
 library(bslib)
 library(tidyverse)
+library(googledrive)
 
 server <- function(input, output, session) {
   
@@ -36,6 +37,9 @@ server <- function(input, output, session) {
     garge_oauth_email = TRUE,
     garge_oauth_cache = 'credentials/.secrets'
   )
+  
+  googledrive::drive_auth(cache = "credentials/.secrets",
+             email = 'mesocarnivoresbc@gmail.com')
   
   # browser()
   # Read the log-book from the Google drive account.

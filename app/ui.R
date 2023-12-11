@@ -25,9 +25,8 @@ main = div(
   fluidRow(
     bslib::card(
     HTML("<br><br><br><br><br><br><br><br>"),
-    style = 'background: url(Marten_name.jpg); 
+    style = 'background: url(Marten_name_cropped.jpg); 
              background-size: cover;
-             background-position-y: -150px;
              width: 90%; text-align:center;
              color: white;
              margin-left: 5%;
